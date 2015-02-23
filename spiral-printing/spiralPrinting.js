@@ -1,21 +1,21 @@
 var fs  = require("fs");
 fs.readFileSync(process.argv[2]).toString().split('\n').forEach(function (line) {
     if (line != "") {
-        // console.log(line);
         var lineData = line.split(';');
-        var x = lineData[0];
-        var y = lineData[1];
-
+        var rows = lineData[0];
+        var cols = lineData[1];
         var nums = lineData[2].split(' ');
-        printSpiral(x,y,nums);
+        console.log(printSpiral(rows,cols,nums));
     }
 });
 
-function printSpiral(x,y,nums) {
-    var i, output ='';
-    // Make a real matrix out of it
-    //console.log("matrix",x,"x",y);
-    var line = [], matrix = [];
+function printSpiral(y,x,nums) {
+    // Create matrix
+    var i,
+        output = '',
+        line = [], 
+        matrix = [];
+
     for (var i = 0; i < y; i++) {
         line = [];
         for (var j = 0; j < x; j++) {
@@ -23,43 +23,64 @@ function printSpiral(x,y,nums) {
         }
         matrix.push(line);
     }
-    console.log(matrix);
+    //console.log(matrix);
 
+    // Print matrix in spiral
     var topBoundary = 0,
         rightBoundary = x,
         bottomBoundary = y,
-        leftBoundary = 0;
+        leftBoundary = 0,
+        output = [],
+        visited = [];
 
-    while (topBoundary < bottomBoundary && leftBoundary < rightBoundary) {
+    function checkContinue() {
+        return topBoundary < bottomBoundary && leftBoundary < rightBoundary;
+    }
+
+    while (checkContinue()) {
         // Print rightwards
-        for (i = leftBoundary; i < rightBoundary; i++) {
-            output += matrix[topBoundary][i] + ' ';
+        if (checkContinue()) {
+            for (i = leftBoundary; i < rightBoundary; i++) {
+                if (matrix[topBoundary][i]) {
+                    output.push(matrix[topBoundary][i]);
+                    matrix[topBoundary][i] = false;
+                }
+            }
+            topBoundary += 1;
         }
-        topBoundary += 1;
-        if (topBoundary < bottomBoundary) {
-            // Print downwards
+
+        // Print downwards
+        if (checkContinue()) {
             for (i = topBoundary; i < bottomBoundary; i++) {
-                output += matrix[i][rightBoundary-1] + ' ';
+                if (matrix[i][rightBoundary-1]) {
+                    output.push(matrix[i][rightBoundary-1]);
+                    matrix[i][rightBoundary-1] = false;
+                }
             }
             rightBoundary -= 1;
-        
-            if (leftBoundary < rightBoundary) {
-                // Print leftwards
-                for (i = (rightBoundary-1); i >= leftBoundary; i--) {
-                   output += matrix[bottomBoundary-1][i] + ' ';
-                }
-                bottomBoundary -= 1;
-
-                if (topBoundary < bottomBoundary) {
-                    // Print upwards
-                    for (i = (bottomBoundary-1); i >= topBoundary; i--) {
-                        output += matrix[i][leftBoundary] + ' ';
-                    }
-
-                    leftBoundary += 1;
+        }
+    
+        // Print leftwards
+        if (checkContinue()) {
+            for (i = (rightBoundary-1); i >= leftBoundary; i--) {
+                if (matrix[bottomBoundary-1][i]) {
+                    output.push(matrix[bottomBoundary-1][i]);
+                    matrix[bottomBoundary-1][i] = false;
                 }
             }
+            bottomBoundary -= 1;
+        }
+
+        if (checkContinue()) {
+            // Print upwards
+            for (i = (bottomBoundary-1); i >= topBoundary; i--) {
+                if (matrix[i][leftBoundary]) {
+                    output.push(matrix[i][leftBoundary]);
+                    matrix[i][leftBoundary] = false;
+                }
+            }
+            leftBoundary += 1;
         }
     }
-    console.log(output);
+    return output.join(" ");
 }   
